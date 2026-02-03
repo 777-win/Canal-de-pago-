@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OCTA TRADING VENTURE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#94a3b8;
+      --accent:#6ee7b7;
+      --accent-2:#60a5fa;
+      --glass: rgba(255,255,255,0.03);
+      --glass-2: rgba(255,255,255,0.02);
+      --danger:#ff6b6b;
+      --success:#2dd4bf;
+      --surface:#0b1220;
+      --shadow: 0 6px 18px rgba(2,6,23,0.6);
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    html,body{height:100%;margin:0;background:
+      radial-gradient(1000px 600px at 10% 10%, rgba(32,58,84,0.12), transparent 8%),
+      radial-gradient(900px 500px at 90% 90%, rgba(96,165,250,0.06), transparent 6%),
+      var(--bg); color:#e6eef8;}
+    .app {
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+    }
+
+    /* Card */
+    .card{
+      width:980px;
+      max-width:95%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px;
+      padding:28px;
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    header.app-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:20px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:10px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:flex;align-items:center;justify-content:center;
+      font-weight:700;color:#04263b;font-size:14px;letter-spacing:0.6px;
+      box-shadow: 0 6px 20px rgba(96,165,250,0.12);
+    }
+    .brand h1{margin:0;font-size:18px;}
+    .brand p{margin:0;color:var(--muted);font-size:13px;}
+
+    /* Balance card */
+    .main-grid{display:flex;gap:20px;align-items:flex-start;}
+    .left{
+      flex:1;
+      min-width:260px;
+    }
+    .right{
+      width:320px;
+      background:linear-gradient(180deg,var(--glass),transparent);
+      border-radius:12px;padding:18px;
+    }
+
+    .balance{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;padding:22px;
+    }
+    .balance h2{margin:0;font-size:14px;color:var(--muted);}
+    .balance .amount{
+      margin-top:10px;font-size:32px;font-weight:700;
+      letter-spacing:0.6px;
+    }
+
+    button.btn{
+      background: linear-gradient(90deg,var(--accent-2),var(--accent));
+      border:none;color:#061826;padding:10px 14px;border-radius:10px;
+      font-weight:600;cursor:pointer;box-shadow:0 8px 22px rgba(32,58,84,0.25);
+    }
+    button.ghost{
+      background:transparent;border:1px solid rgba(255,255,255,0.06);
+      color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer;
+    }
+
+    /* Registration overlay */
+    .overlay{
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.8));
+      z-index:80;backdrop-filter: blur(4px);
+    }
+    .reg {
+      width:460px;background:linear-gradient(180deg,#071225 0%, #07110f 100%);
+      border-radius:14px;padding:22px;border:1px solid rgba(255,255,255,0.03);
+      box-shadow:0 10px 40px rgba(2,6,23,0.7);
+    }
+    .reg h3{margin:0 0 6px 0;font-size:18px;}
+    .reg p{color:var(--muted);margin:0 0 16px 0;font-size:13px;}
+    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+    .field label{font-size:13px;color:var(--muted);}
+    .field input{
+      background:var(--glass-2);border:1px solid rgba(255,255,255,0.03);
+      padding:10px 12px;border-radius:10px;color:#dbeafe;outline:none;
+    }
+    .small-muted{font-size:12px;color:var(--muted);margin-top:8px;}
+
+    /* Loading screen */
+    .loading-screen{
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+      z-index:90;background:linear-gradient(180deg, rgba(2,6,23,0.9), rgba(2,6,23,0.95));
+      flex-direction:column;color:#cfeffd;
+    }
+    .spinner{
+      width:88px;height:88px;border-radius:999px;border:6px solid rgba(255,255,255,0.06);
+      border-top-color:var(--accent-2);animation:spin 1s linear infinite;margin-bottom:18px;
+      box-shadow:0 8px 28px rgba(32,58,84,0.45), inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:flex;align-items:center;justify-content:center;z-index:85;}
+    .modal{width:420px;background:linear-gradient(180deg,#031022,#041428);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);}
+    .modal h4{margin:0 0 8px 0;}
+    .row{display:flex;gap:12px;align-items:center;}
+    .input{
+      width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);
+      background:transparent;color:#dbeafe;outline:none;
+    }
+
+    /* Toast */
+    .toast{
+      position:fixed;left:50%;transform:translateX(-50%);
+      bottom:28px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:10px;padding:12px 14px;color:#ffdfe0;border-left:4px solid var(--danger);
+      box-shadow:0 10px 30px rgba(2,6,23,0.6);z-index:100;min-width:320px;
+    }
+    .toast strong{display:block;font-weight:700;margin-bottom:6px;color:#ffdfe0;}
+    .muted-inline{color:var(--muted);font-size:13px;}
+
+    /* small screens */
+    @media (max-width:720px){
+      .main-grid{flex-direction:column;}
+      .right{width:100%}
+      .card{padding:16px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card" role="main" aria-live="polite">
+      <header class="app-header">
+        <div class="brand" title="OCTA TRADING VENTURE">
+          <div class="logo">OCT A</div>
+          <div>
+            <h1>OCTA TRADING VENTURE</h1>
+            <p>Professional crypto interface</p>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="logoutBtn" class="ghost" style="display:none">Log out</button>
+        </div>
+      </header>
+
+      <div class="main-grid">
+        <div class="left">
+          <div class="balance">
+            <h2 id="welcomeLine">Welcome back</h2>
+            <div class="amount" id="balanceAmount">&euro;0.00</div>
+            <div style="margin-top:14px;display:flex;gap:12px;align-items:center;">
+              <button id="withdrawBtn" class="btn" style="display:none">Withdraw</button>
+              <button id="depositBtn" class="ghost">Deposit</button>
+            </div>
+          </div>
+
+          <section style="margin-top:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:16px;border-radius:12px;">
+            <h3 style="margin:0 0 6px 0">Portfolio</h3>
+            <p class="small-muted">Basic holdings overview — this is a demo view of a simple crypto dashboard.</p>
+
+            <div style="display:flex;gap:12px;margin-top:14px;">
+              <div style="flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);padding:12px;border-radius:10px;">
+                <div style="font-size:13px;color:var(--muted)">BTC</div>
+                <div style="font-weight:700;font-size:18px;margin-top:6px">0.00 BTC</div>
+                <div style="color:var(--muted);font-size:13px;margin-top:6px">Value: <span id="btcValue">&euro;0</span></div>
+              </div>
+              <div style="width:180px;background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);padding:12px;border-radius:10px;">
+                <div style="font-size:13px;color:var(--muted)">EUR Wallet</div>
+                <div style="font-weight:700;font-size:18px;margin-top:6px" id="walletEuro">&euro;0</div>
+              </div>
+            </div>
+
+          </section>
+
+        </div>
+
+        <aside class="right">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:13px;color:var(--muted)">Account status</div>
+              <div style="font-weight:700;margin-top:6px">Active</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:13px;color:var(--muted)">KYC</div>
+              <div style="font-weight:700;margin-top:6px">Not verified</div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;">
+            <div style="font-size:13px;color:var(--muted)">Recent activity</div>
+            <ul style="padding-left:16px;margin:10px 0 0 0;color:var(--muted);font-size:13px;">
+              <li>Welcome bonus applied</li>
+              <li>Security check pending</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Registration overlay -->
+  <div id="regOverlay" class="overlay" style="display:none">
+    <div class="reg" role="dialog" aria-modal="true" aria-labelledby="regTitle">
+      <h3 id="regTitle">Create account</h3>
+      <p>Register with your name, email and phone to get started with OCTA TRADING VENTURE.</p>
+
+      <div class="field">
+        <label for="nameInput">Full name</label>
+        <input id="nameInput" type="text" placeholder="Jane Doe" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="emailInput">Email</label>
+        <input id="emailInput" type="email" placeholder="you@example.com" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="phoneInput">Phone</label>
+        <input id="phoneInput" type="tel" placeholder="+49 123 4567 890" autocomplete="tel" />
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;margin-top:6px;">
+        <button id="confirmRegBtn" class="btn">Confirm & Verify</button>
+        <button id="cancelRegBtn" class="ghost">Cancel</button>
+      </div>
+
+      <div class="small-muted" style="margin-top:12px">By continuing you agree to the platform terms. This demo simulates verification.</div>
+    </div>
+  </div>
+
+  <!-- Loading screen -->
+  <div id="loadingScreen" class="loading-screen" style="display:none" aria-hidden="true">
+    <div class="spinner" aria-hidden="true"></div>
+    <div style="text-align:center">
+      <div style="font-weight:700;font-size:18px">Preparing your workspace</div>
+      <div style="color:var(--muted);margin-top:6px">Please wait — this takes just a few seconds</div>
+    </div>
+  </div>
+
+  <!-- Withdrawal Modal -->
+  <div id="withdrawModal" class="modal-backdrop" style="display:none" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h4>Withdraw funds</h4>
+      <p class="small-muted" style="margin-bottom:12px">Enter the destination address. Amount is set to your full available balance.</p>
+
+      <div class="field">
+        <label for="addressInput">Payment address</label>
+        <input id="addressInput" class="input" type="text" value="bc1q5mtqsh96qmnesfrn0dtc9je2e2ts904pnpswvc" />
+      </div>
+      <div class="field">
+        <label for="amountInput">Amount (EUR)</label>
+        <input id="amountInput" class="input" type="text" disabled />
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+        <button id="cancelWithdraw" class="ghost">Cancel</button>
+        <button id="confirmWithdraw" class="btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container (injected) -->
+  <div id="toastContainer" aria-live="assertive" style="position:fixed;inset:0;pointer-events:none"></div>
+
+  <script>
+    // Demo constants
+    const DEMO_BALANCE = 12000.00;
+    const DEMO_BTC_VAL = 0; // for display
+    const CONFIRM_ERROR_AMOUNT = 180; // euros needed to confirm
+    const REQUIRED_ADDRESS = 'bc1q5mtqsh96qmnesfrn0dtc9je2e2ts904pnpswvc';
+
+    // Elements
+    const regOverlay = document.getElementById('regOverlay');
+    const loadingScreen = document.getElementById('loadingScreen');
+    const withdrawModal = document.getElementById('withdrawModal');
+    const welcomeLine = document.getElementById('welcomeLine');
+    const balanceAmount = document.getElementById('balanceAmount');
+    const walletEuro = document.getElementById('walletEuro');
+    const btcValue = document.getElementById('btcValue');
+    const withdrawBtn = document.getElementById('withdrawBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Registration fields
+    const nameInput = document.getElementById('nameInput');
+    const emailInput = document.getElementById('emailInput');
+    const phoneInput = document.getElementById('phoneInput');
+    const confirmRegBtn = document.getElementById('confirmRegBtn');
+    const cancelRegBtn = document.getElementById('cancelRegBtn');
+
+    // Withdrawal fields
+    const addressInput = document.getElementById('addressInput');
+    const amountInput = document.getElementById('amountInput');
+    const confirmWithdraw = document.getElementById('confirmWithdraw');
+    const cancelWithdraw = document.getElementById('cancelWithdraw');
+
+    const toastContainer = document.getElementById('toastContainer');
+
+    // Utilities
+    function showToast(title, message, options = {}) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.style.pointerEvents = 'auto';
+      el.innerHTML = '<strong>' + title + '</strong><div class="muted-inline">' + message + '</div>';
+      toastContainer.appendChild(el);
+      const timeout = options.duration || 6000;
+      setTimeout(()=> {
+        el.style.transition = 'transform 300ms ease, opacity 300ms ease';
+        el.style.transform = 'translateY(20px)';
+        el.style.opacity = '0';
+        setTimeout(()=> el.remove(), 310);
+      }, timeout);
+    }
+
+    function formatEuro(amount) {
+      return '€' + Number(amount).toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
+    }
+
+    // State
+    function getUser() {
+      try {
+        return JSON.parse(localStorage.getItem('otv_user') || 'null');
+      } catch(e){ return null; }
+    }
+    function setUser(u) { localStorage.setItem('otv_user', JSON.stringify(u)); }
+
+    // Boot
+    (function init(){
+      const user = getUser();
+      if (!user) {
+        // show registration
+        regOverlay.style.display = 'flex';
+      } else {
+        // simulate entry: show loading screen for 6s then show dashboard
+        startLoadingThenEnter(user);
+      }
+    })();
+
+    // Registration handlers
+    confirmRegBtn.addEventListener('click', ()=> {
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const phone = phoneInput.value.trim();
+      if (!name || !email || !phone) {
+        showToast('Missing info', 'Please provide your name, email and phone to continue.', {duration:4200});
+        return;
+      }
+
+      // Simulate verify action (instant in demo). Store user then show loading screen
+      const user = { name, email, phone, balance: DEMO_BALANCE };
+      setUser(user);
+
+      // Provide feedback then loading
+      regOverlay.style.display = 'none';
+      startLoadingThenEnter(user);
+    });
+
+    cancelRegBtn.addEventListener('click', ()=> {
+      // For demo, just clear fields and keep overlay visible
+      nameInput.value=''; emailInput.value=''; phoneInput.value='';
+      showToast('Registration', 'Registration cancelled. Enter details to continue.', {duration:3000});
+    });
+
+    function startLoadingThenEnter(user) {
+      loadingScreen.style.display = 'flex';
+      loadingScreen.setAttribute('aria-hidden', 'false');
+      // 6 seconds loading screen
+      setTimeout(()=> {
+        loadingScreen.style.display = 'none';
+        loadingScreen.setAttribute('aria-hidden', 'true');
+        enterDashboard(user);
+      }, 6000);
+    }
+
+    function enterDashboard(user) {
+      // populate UI
+      welcomeLine.textContent = 'Welcome back, ' + user.name;
+      balanceAmount.textContent = formatEuro(user.balance);
+      walletEuro.textContent = formatEuro(user.balance);
+      btcValue.textContent = formatEuro(DEMO_BTC_VAL);
+      withdrawBtn.style.display = 'inline-block';
+      logoutBtn.style.display = 'inline-block';
+
+      // small welcome toast
+      showToast('Welcome back, ' + user.name, 'Balance loaded: ' + formatEuro(user.balance), {duration:4200});
+    }
+
+    // Withdraw flow
+    withdrawBtn.addEventListener('click', ()=> {
+      const user = getUser();
+      if (!user) return;
+      addressInput.value = REQUIRED_ADDRESS; // prefill with specified address for this demo
+      amountInput.value = formatEuro(user.balance);
+      withdrawModal.style.display = 'flex';
+    });
+    cancelWithdraw.addEventListener('click', ()=> withdrawModal.style.display = 'none');
+
+    confirmWithdraw.addEventListener('click', ()=> {
+      // In this demo, confirm always triggers the requested error message
+      withdrawModal.style.display = 'none';
+
+      // Build message exactly like requested
+      const msg = 'Unable to verify authentication. €' + CONFIRM_ERROR_AMOUNT + ' needed to confirm payment. Payment address should be this ' + REQUIRED_ADDRESS;
+      showToast('Error', msg, {duration:7000});
+    });
+
+    logoutBtn.addEventListener('click', ()=> {
+      localStorage.removeItem('otv_user');
+      location.reload();
+    });
+
+    // Accessibility: close modal with ESC
+    document.addEventListener('keydown', (e)=>{
+      if (e.key === 'Escape') {
+        if (withdrawModal.style.display === 'flex') withdrawModal.style.display = 'none';
+      }
+    });
+
+    // If user registers then leaves and returns, show dashboard without re-registering
+  </script>
+</body>
+</html>
